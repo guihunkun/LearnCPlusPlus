@@ -89,9 +89,11 @@ int main()
     set<Point, lessCmpTest> tmpG(cmperGreat);
     set<Point, lessCmpTest> tmpS(cmperSmall);
 
+    cout<<"cmperGreat"<<endl;
     generatePoint(tmpG);
     printPoints(tmpG);
 
+    cout<<"cmperSmall"<<endl;
     generatePoint(tmpS);
     printPoints(tmpS);
 
