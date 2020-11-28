@@ -2,11 +2,13 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <math.h>
 #include <iomanip>
 
 using namespace std;
 
+const double EPS = 1;
 
 class Point
 {
@@ -24,19 +26,18 @@ private:
 
 bool Point::operator < (const Point& p) const
 {
-    const double EPS = 1e-5;
     double x = p.getX();
     double y = p.getY();
     double dis = (_x-x)*(_x-x) + (_y-y)*(_y-y);
-    if(fabs(dis-EPS) < 1e-10)
-        return true;
-    return false;
+    dis = sqrt(dis);
+    return dis > EPS;
 }
+
 
 class lessCmpTest
 {
 public:
-    lessCmpTest(const double eps = 0.0) : _eps(fabs(eps)) {}
+    lessCmpTest(const double eps = 0.1) : _eps(fabs(eps)) {}
 public:
     bool operator() (const Point& p1, const Point& p2) const;
 
@@ -52,19 +53,16 @@ bool lessCmpTest::operator() (const Point& p1, const Point& p2) const
     double x2 = p2.getX();
     double y2 = p2.getY();
     double dis = (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
-    return (dis >= (_eps*_eps));
+    dis = sqrt(dis);
+    return dis > _eps;
 }
 
 void generatePoint(set<Point, lessCmpTest>& record)
 {
-    Point p;
-
-    p = Point(1.0, 1.0);
-    record.insert(p);
-    p = Point(1.0, 1.009);
-    record.insert(p);
-    p = Point(1.0, 1.0000001);
-    record.insert(p);
+    record.clear();
+    record.insert(Point(0, 0));
+    record.insert(Point(0, 0.1));
+    record.insert(Point(0, 2));
 }
 
 void printPoints(set<Point, lessCmpTest>& record)
@@ -81,14 +79,25 @@ void printPoints(set<Point, lessCmpTest>& record)
     cout<<endl;
 }
 
+
 int main()
 {
-    lessCmpTest cmperGreat(0.01);
-    lessCmpTest cmperSmall(0.00001);
+
+    set<Point> rec;
+    rec.insert(Point(0, 0));
+    rec.insert(Point(1, 1));
+    rec.insert(Point(0, 1));
+
+    for(set<Point>::iterator iter = rec.begin(); iter != rec.end(); iter++) {
+        cout<<(*iter).getX()<<" "<<(*iter).getY()<<endl;
+    }
+
+    lessCmpTest cmperGreat(1);
+    lessCmpTest cmperSmall(0.01);
 
     set<Point, lessCmpTest> tmpG(cmperGreat);
     set<Point, lessCmpTest> tmpS(cmperSmall);
-
+    
     cout<<"cmperGreat"<<endl;
     generatePoint(tmpG);
     printPoints(tmpG);
@@ -96,7 +105,6 @@ int main()
     cout<<"cmperSmall"<<endl;
     generatePoint(tmpS);
     printPoints(tmpS);
-
 
     return 0;
 }
